@@ -18,7 +18,7 @@ namespace identityapps.Controllers
         public IActionResult Index()
         {
             return View();
-        }
+        }      
         [HttpGet]
         public async Task<IActionResult> Login(string returnurl)
         {
@@ -83,6 +83,18 @@ namespace identityapps.Controllers
             return RedirectToAction(nameof(HomeController.Index),"Home");
         }
 
+        [HttpGet]
+        public IActionResult ForgotPassword()
+        {            
+            return View();
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel model)
+        {          
+          
+            return View(model);
+        }
         private void AddErrors (IdentityResult result)
         {
             foreach (var error  in result.Errors)

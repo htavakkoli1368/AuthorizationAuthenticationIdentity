@@ -7,5 +7,6 @@ namespace identityapps.Models
     {
         [Required]
         public string Name { get; set; }
+
     }
 }
