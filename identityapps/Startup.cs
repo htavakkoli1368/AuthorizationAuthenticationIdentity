@@ -28,6 +28,13 @@ namespace identityapps
         {
             services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
             services.AddIdentity<IdentityUser, IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>();
+            services.Configure<IdentityOptions>(options =>
+            {
+                options.Password.RequiredLength = 5;
+                options.Password.RequireLowercase = true;
+                options.Lockout.DefaultLockoutTimeSpan=TimeSpan.FromSeconds(120);
+                options.Lockout.MaxFailedAccessAttempts = 2;
+            });
             services.AddControllersWithViews();
         }
 
