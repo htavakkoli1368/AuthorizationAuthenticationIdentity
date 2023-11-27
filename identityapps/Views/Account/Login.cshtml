@@ -1,4 +1,6 @@
 ﻿@model LoginViewModel
+@using Microsoft.AspNetCore.Identity;
+@inject SignInManager<IdentityUser> _signinManager;
 
 <h1>Log in</h1>
 <div class="row">
@@ -46,6 +48,33 @@
             </form>
         </section>
     </div>
+    @{
+        var schema = await _signinManager.GetExternalAuthenticationSchemesAsync();
+        var loginprovider = schema.ToList();
+    }
+    @if (loginprovider.Count() > 0)
+    {
+
+         <div class="col-md-4">
+              <section>
+                  <h4></h4>
+                  <form asp-controller="Account" asp-action="ExternalLogin" asp-route-returnurl="@ViewData["ReturnUrl"]" method="post"  role="form">
+                      <div>
+                          <p>
+                            @foreach (var loginp in loginprovider)
+                              {
+                                  <button type="submit" class="btn btn-primary" name="provider" value="@loginp.Name" title="login using @loginp.Name Account" > 
+                                       @loginp.Name
+                                  </button>
+                              }
+
+                          </p>
+                      </div>
+                  </form>
+              </section>
+          </div>  
+    }
+            
 
 </div>
 

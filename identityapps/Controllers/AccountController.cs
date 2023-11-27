@@ -1,6 +1,7 @@
 ﻿using identityapps.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace identityapps.Controllers
@@ -9,7 +10,8 @@ namespace identityapps.Controllers
     {
         private readonly UserManager<IdentityUser> _userManager;
         private readonly SignInManager<IdentityUser> _signinManager;
-
+        
+          
         public AccountController(UserManager<IdentityUser> userManager,SignInManager<IdentityUser> signInManager)
         {
             _userManager = userManager;
@@ -20,7 +22,7 @@ namespace identityapps.Controllers
             return View();
         }      
         [HttpGet]
-        public async Task<IActionResult> Login(string returnurl)
+        public IActionResult Login(string returnurl)
         {
             ViewData["ReturnUrl"] = returnurl;
             return View();
@@ -50,7 +52,7 @@ namespace identityapps.Controllers
             return View(model);
         }
         [HttpGet]
-        public async Task<IActionResult> Register(string returnurl)
+        public IActionResult Register(string returnurl)
         {
             ViewData["ReturnUrl"] = returnurl;
             var registermodel = new RegisterViewModel();
@@ -90,9 +92,43 @@ namespace identityapps.Controllers
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel model)
-        {          
-          
+        public IActionResult ExternalLogin(string provider,string returnurl)
+        {
+            var redirectUrl = Url.Action("ExternalLoginCallback", "Account",new { ReturnUrl = returnurl});
+            var properties = _signinManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
+            return Challenge(properties, provider);
+        }
+        [HttpGet]        
+        public async Task<IActionResult> ExternalLoginCallback(string returnurl, string remoteError=null)
+        {
+            if(remoteError != null)
+            {
+                ModelState.AddModelError(string.Empty, "Error occured");
+            }
+            var info = await _signinManager.GetExternalLoginInfoAsync();
+            if(info == null)
+            {
+                return RedirectToAction(nameof(Login));
+            }
+            var result = await _signinManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: false);
+            if (result.Succeeded)
+            {
+                await _signinManager.UpdateExternalAuthenticationTokensAsync(info);
+                return LocalRedirect(returnurl);
+            }
+            else
+            {
+                ViewData["ReturnUrl"] = returnurl;
+                ViewData["ProviderDisplayName"] = info.ProviderDisplayName;
+                var email = info.Principal.FindFirstValue(ClaimTypes.Email);
+                return View("ExternalLoginConfirmation",new ExternalLoginConfirmationViewModel { Email=email});
+
+            }            
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult ForgotPassword(ForgotPasswordViewModel model)
+        {           
             return View(model);
         }
         private void AddErrors (IdentityResult result)
