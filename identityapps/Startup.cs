@@ -39,6 +39,12 @@ namespace identityapps
             {
                 options.AppId = "651590570214073";
                 options.AppSecret = "7a5f1eaa825e219aaa0879946654e4d5";
+            }).AddGoogle(options =>
+            {
+                IConfigurationSection googleAuthNSection =
+                Configuration.GetSection("Authentication:Google");
+                options.ClientId ="https://70958426261-39e4pbhrvau13ins97pvaqo1ps92r0uj.apps.googleusercontent.com/";
+                options.ClientSecret = "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";
             }); 
             services.AddControllersWithViews();
         }
