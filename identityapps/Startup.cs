@@ -35,16 +35,18 @@ namespace identityapps
                 options.Lockout.DefaultLockoutTimeSpan=TimeSpan.FromSeconds(120);
                 options.Lockout.MaxFailedAccessAttempts = 2;
             });
+            services.ConfigureApplicationCookie(opt =>
+            {
+                opt.AccessDeniedPath = new Microsoft.AspNetCore.Http.PathString("/Home/Accessdenied");
+            });
             services.AddAuthentication().AddFacebook(options =>
             {
                 options.AppId = "651590570214073";
                 options.AppSecret = "7a5f1eaa825e219aaa0879946654e4d5";
             }).AddGoogle(options =>
-            {
-                IConfigurationSection googleAuthNSection =
-                Configuration.GetSection("Authentication:Google");
-                options.ClientId ="https://70958426261-39e4pbhrvau13ins97pvaqo1ps92r0uj.apps.googleusercontent.com/";
-                options.ClientSecret = "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";
+            {               
+                options.ClientId = "73693541372-qkn1thre65ogqotddspei7abcgr1147b.apps.googleusercontent.com";
+                options.ClientSecret = "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";
             }); 
             services.AddControllersWithViews();
         }

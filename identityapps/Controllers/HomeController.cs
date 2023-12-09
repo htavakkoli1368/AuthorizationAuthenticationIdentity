@@ -23,8 +23,13 @@ namespace identityapps.Controllers
         {
             return View();
         }
-        [Authorize] 
+        [Authorize (Roles="admin")] 
         public IActionResult Privacy()
+        {
+            return View();
+        }
+        
+        public IActionResult AccessDenied()
         {
             return View();
         }
